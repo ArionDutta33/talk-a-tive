@@ -19,7 +19,7 @@ const registerUser = asyncHandler(async (req, res) => {
         password,
         pic
     })
-    if (user) {
+    if (user && (await user.matchPassword(password))) {
         res.status(200).json({
             _id: user._id,
             name: user.name,
@@ -32,4 +32,22 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("Failed to create a new user")
     }
 })
-module.exports = { registerUser }
+
+const authUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email });
+
+    if (user) {
+        res.json({
+            _id: user.id,
+            name: user.name,
+            email: user.email,
+            pic: user.pic,
+            token: generateToken(user._id)
+        })
+    } else {
+        res.status(401)
+        throw new Error("Invalid Email or Password")
+    }
+})
+module.exports = { registerUser, authUser }
