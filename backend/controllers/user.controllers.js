@@ -19,8 +19,10 @@ const registerUser = asyncHandler(async (req, res) => {
         password,
         pic
     })
-    if (user && (await user.matchPassword(password))) {
-        res.status(200).json({
+    //!this user.match should have been in login check 
+    //*solved
+    if (user) {
+        res.status(201).json({
             _id: user._id,
             name: user.name,
             email: user.email,
@@ -37,7 +39,7 @@ const authUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
 
-    if (user) {
+    if (user && (await user.matchPassword(password))) {
         res.json({
             _id: user.id,
             name: user.name,
